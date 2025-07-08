@@ -46,3 +46,9 @@ variable "variables_sub_auto_ip" {
   type        = bool
   default     = true
 }
+
+variable "environment" {
+  description = "Environment for the deployment (e.g., dev, staging, prod)"
+  type        = string
+  default     = "dev"
+}
