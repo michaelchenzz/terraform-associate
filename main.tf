@@ -136,7 +136,7 @@ data "aws_ami" "ubuntu" {
 }
 
 # Terraform Resource Block - To Build EC2 instance in Public Subnet
-resource "aws_instance" "ubuntu_server" {
+resource "aws_instance" "web_server" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
@@ -156,6 +156,7 @@ resource "aws_instance" "ubuntu_server" {
 
   provisioner "remote-exec" {
     inline = [
+      "exit 2",
       "sudo rm -rf /tmp",
       "sudo git clone https://github.com/hashicorp/demo-terraform-101 /tmp",
       "sudo sh /tmp/assets/setup-web.sh",
@@ -163,7 +164,7 @@ resource "aws_instance" "ubuntu_server" {
   }
 
   tags = {
-    Name = "Ubuntu EC2 Server"
+    Name = "Web EC2 Server"
   }
 
   lifecycle {
