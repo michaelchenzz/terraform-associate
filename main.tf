@@ -261,3 +261,55 @@ resource "aws_security_group" "vpc-ping" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+module "server" {
+  source    = "./modules/server"
+  ami       = data.aws_ami.ubuntu.id
+  subnet_id = aws_subnet.public_subnets["public_subnet_3"].id
+  security_groups = [
+    aws_security_group.vpc-ping.id,
+    aws_security_group.ingress-ssh.id,
+    aws_security_group.vpc-web.id
+  ]
+}
+
+module "server_subnet_1" {
+  source      = "./modules/web_server"
+  ami         = data.aws_ami.ubuntu.id
+  key_name    = aws_key_pair.generated.key_name
+  user        = "ubuntu"
+  private_key = local_file.private_key_pem.content
+  subnet_id   = aws_subnet.public_subnets["public_subnet_1"].id
+  security_groups = [
+    aws_security_group.vpc-ping.id,
+    aws_security_group.ingress-ssh.id,
+    aws_security_group.vpc-web.id
+  ]
+}
+
+module "autoscaling" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "8.0.1"
+
+  # Autoscaling group
+  name = "myasg"
+
+  vpc_zone_identifier = [
+    aws_subnet.private_subnets["private_subnet_1"].id,
+    aws_subnet.private_subnets["private_subnet_2"].id,
+    aws_subnet.private_subnets["private_subnet_3"].id
+  ]
+  min_size         = 0
+  max_size         = 1
+  desired_capacity = 1
+
+  # Launch template
+  image_id      = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+  instance_name = "asg-instance"
+
+  tags = {
+    Name = "Web EC2 Server 2"
+  }
+
+}
