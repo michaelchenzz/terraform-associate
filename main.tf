@@ -291,3 +291,12 @@ module "server_subnet_1" {
 output "size" {
   value = module.server.size
 }
+
+module "s3-bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "5.2.0"
+}
+
+output "s3_bucket_name" {
+  value = module.s3-bucket.s3_bucket_bucket_domain_name
+}
