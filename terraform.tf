@@ -1,9 +1,22 @@
 terraform {
-  backend "s3" {
-    bucket = "rshcm-terraform-bucket-mc"
-    key    = "prod/aws_infra"
-    region = "us-east-1"
-  }
+  # backend "local" {
+  #   path = "terraform.tfstate"
+  # }
+
+  # backend "s3" {
+  #   bucket = "rshcm-terraform-bucket-mc"
+  #   key    = "prod/aws_infra"
+  #   region = "us-east-1"
+  # }
+
+  # backend "remote" {
+  #   hostname     = "app.terraform.io"
+  #   organization = "michaelchen-learn-terraform"
+  #   workspaces {
+  #     name = "my-aws-app"
+  #   }
+  # }
+
   required_version = ">= 1.0.0"
   required_providers {
     aws = {
