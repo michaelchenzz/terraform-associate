@@ -24,7 +24,7 @@ locals {
     Service   = local.service_name
     AppTeam   = local.app_team
     CreatedBy = local.createdby
- } 
+  }
 }
 
 #Retrieve the list of AZs in the current AWS region
@@ -67,6 +67,19 @@ resource "aws_subnet" "public_subnets" {
 
   tags = {
     Name      = each.key
+    Terraform = "true"
+  }
+}
+
+#Create a Variables Subnet
+resource "aws_subnet" "variables_subnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.variables_sub_cidr
+  availability_zone       = var.variables_sub_az
+  map_public_ip_on_launch = var.variables_sub_auto_ip
+
+  tags = {
+    Name      = "sub-variables-${var.variables_sub_az}"
     Terraform = "true"
   }
 }
