@@ -34,3 +34,9 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "variables_sub_az" {
+  description = "Sub Availability Zone for the server name"
+  type        = string
+  default     = "a"
+}
