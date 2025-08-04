@@ -38,7 +38,7 @@ data "aws_region" "current" {}
 
 #Define the VPC
 resource "aws_vpc" "vpc" {
-  cidr_block = var.vpc_cidr
+  cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
 
   tags = {
@@ -193,7 +193,7 @@ resource "aws_instance" "web_server" {
   }
 
   # Leave the first part of the block unchanged and create our `local-exec` provisioner
-/*   provisioner "local-exec" {
+  /*   provisioner "local-exec" {
     command = "chmod 600 ${local_file.private_key_pem.filename}"
   } */
 
@@ -217,10 +217,10 @@ resource "tls_private_key" "generated" {
   algorithm = "RSA"
 }
 
-/* resource "local_file" "private_key_pem" {
+resource "local_file" "private_key_pem" {
   content  = tls_private_key.generated.private_key_pem
   filename = "MyAWSKey.pem"
-} */
+}
 
 resource "aws_key_pair" "generated" {
   key_name   = "MyAWSKey"
@@ -315,7 +315,7 @@ module "server" {
   ]
 }
 
-/* module "server_subnet_1" {
+module "server_subnet_1" {
   source      = "./modules/web_server"
   ami         = data.aws_ami.ubuntu.id
   key_name    = aws_key_pair.generated.key_name
@@ -325,9 +325,10 @@ module "server" {
   security_groups = [
     aws_security_group.vpc-ping.id,
     aws_security_group.ingress-ssh.id,
-    aws_security_group.vpc-web.id
+    aws_security_group.vpc-web.id,
+    aws_security_group.main.id
   ]
-} */
+}
 
 output "size" {
   value = module.server.size
@@ -343,8 +344,8 @@ output "min_value" {
 
 locals {
   ingress_rules = [{
-      port        = 443
-      description = "Port 443"
+    port        = 443
+    description = "Port 443"
     },
     {
       port        = 80
@@ -354,7 +355,7 @@ locals {
 }
 
 resource "aws_security_group" "main" {
-  name = "core-sg"
+  name = "core-sg-global"
 
   vpc_id = aws_vpc.vpc.id
 
@@ -367,5 +368,10 @@ resource "aws_security_group" "main" {
       protocol    = ingress.value.protocol
       cidr_blocks = ingress.value.cidr_blocks
     }
+  }
+
+  lifecycle {
+    create_before_destroy = true
+    # prevent_destroy       = true
   }
 }

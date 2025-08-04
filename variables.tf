@@ -54,21 +54,21 @@ variable "variables_sub_auto_ip" {
 }
 
 variable "num_1" {
-  type = number
+  type        = number
   description = "Numbers for function labs"
-  default = 88
+  default     = 88
 }
 
 variable "num_2" {
-  type = number
+  type        = number
   description = "Numbers for function labs"
-  default = 73
+  default     = 73
 }
 
 variable "num_3" {
-  type = number
+  type        = number
   description = "Numbers for function labs"
-  default = 52
+  default     = 52
 }
 
 variable "web_ingress" {
