@@ -18,13 +18,18 @@ locals {
 locals {
   # Common tags to be assigned to all resources
   common_tags = {
-    Name      = local.server_name
-    Owner     = local.team
-    App       = local.application
-    Service   = local.service_name
-    AppTeam   = local.app_team
-    CreatedBy = local.createdby
+    Name      = lower(local.server_name)
+    Owner     = lower(local.team)
+    App       = lower(local.application)
+    Service   = lower(local.service_name)
+    AppTeam   = lower(local.app_team)
+    CreatedBy = lower(local.createdby)
   }
+}
+
+locals {
+  maximum = max(var.num_1, var.num_2, var.num_3)
+  minimum = min(var.num_1, var.num_2, var.num_3, 44, 20)
 }
 
 #Retrieve the list of AZs in the current AWS region
@@ -34,11 +39,12 @@ data "aws_region" "current" {}
 #Define the VPC
 resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
+  enable_dns_hostnames = true
 
   tags = {
-    Name        = var.vpc_name
-    Environment = "demo_environment"
-    Terraform   = "true"
+    Name        = upper(var.vpc_name)
+    Environment = upper(var.environment)
+    Terraform   = upper("true")
     #Region      = data.aws_region.current.name   # Deprecated
     Region = data.aws_region.current.region
   }
@@ -323,22 +329,14 @@ module "server" {
   ]
 } */
 
-resource "aws_subnet" "list_subnet" {
-  for_each          = var.env
-  vpc_id            = aws_vpc.vpc.id
-  cidr_block        = each.value.ip
-  availability_zone = each.value.az
-}
-
 output "size" {
   value = module.server.size
 }
 
-module "s3-bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.2.0"
+output "max_value" {
+  value = local.maximum
 }
 
-output "s3_bucket_name" {
-  value = module.s3-bucket.s3_bucket_bucket_domain_name
+output "min_value" {
+  value = local.minimum
 }
