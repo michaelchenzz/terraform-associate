@@ -42,9 +42,9 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name        = upper(var.vpc_name)
-    Environment = upper(var.environment)
-    Terraform   = upper("true")
+    Name        = var.vpc_name
+    Environment = var.environment
+    Terraform   = "true"
     #Region      = data.aws_region.current.name   # Deprecated
     Region = data.aws_region.current.region
   }
@@ -223,7 +223,7 @@ resource "local_file" "private_key_pem" {
 }
 
 resource "aws_key_pair" "generated" {
-  key_name   = "MyAWSKey"
+  key_name   = "MyAWSKey${var.environment}"
   public_key = tls_private_key.generated.public_key_openssh
 
   lifecycle {
